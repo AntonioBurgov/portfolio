@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Option A — Dark Developer</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0a0a0f;
+      --bg2: #111118;
+      --card: #16161f;
+      --accent: #4f8eff;
+      --accent2: #7eb3ff;
+      --text: #e8eaf0;
+      --muted: #8a8fa8;
+      --border: #1e1e2e;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      line-height: 1.6;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; width: 100%;
+      background: rgba(10,10,15,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 3rem;
+      display: flex; align-items: center; justify-content: space-between;
+      z-index: 100;
+    }
+    .nav-logo {
+      font-size: 1.1rem; font-weight: 700; letter-spacing: 2px;
+      color: var(--accent); text-transform: uppercase;
+    }
+    .nav-links { display: flex; gap: 2rem; }
+    .nav-links a {
+      color: var(--muted); text-decoration: none; font-size: 0.9rem;
+      letter-spacing: 0.5px; transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--accent); }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex; align-items: center;
+      padding: 8rem 3rem 4rem;
+      max-width: 1100px; margin: 0 auto;
+      gap: 4rem;
+    }
+    .hero-text { flex: 1; }
+    .hero-tag {
+      display: inline-block;
+      background: rgba(79,142,255,0.1);
+      border: 1px solid rgba(79,142,255,0.3);
+      color: var(--accent);
+      padding: 0.3rem 1rem; border-radius: 20px;
+      font-size: 0.8rem; letter-spacing: 1px;
+      text-transform: uppercase; margin-bottom: 1.5rem;
+    }
+    .hero h1 {
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 800; line-height: 1.1;
+      margin-bottom: 1rem;
+    }
+    .hero h1 span { color: var(--accent); }
+    .hero-role {
+      font-size: 1.1rem; color: var(--muted);
+      margin-bottom: 1.5rem; font-weight: 400;
+    }
+    .hero-bio {
+      font-size: 1rem; color: var(--muted);
+      max-width: 480px; margin-bottom: 2.5rem;
+      line-height: 1.8;
+    }
+    .hero-cta { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .btn {
+      padding: 0.75rem 1.75rem; border-radius: 6px;
+      font-size: 0.9rem; font-weight: 600; cursor: pointer;
+      text-decoration: none; transition: all .2s;
+    }
+    .btn-primary {
+      background: var(--accent); color: #fff;
+      border: 2px solid var(--accent);
+    }
+    .btn-primary:hover { background: var(--accent2); border-color: var(--accent2); }
+    .btn-outline {
+      background: transparent; color: var(--text);
+      border: 2px solid var(--border);
+    }
+    .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+
+    .hero-photo {
+      width: 320px; height: 380px; flex-shrink: 0;
+      border-radius: 12px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--muted); font-size: 0.85rem;
+      position: relative; overflow: hidden;
+    }
+    .hero-photo::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(79,142,255,0.05) 0%, transparent 60%);
+    }
+    .photo-placeholder { text-align: center; }
+    .photo-placeholder .icon { font-size: 3rem; margin-bottom: 0.5rem; }
+
+    /* SKILLS TICKER */
+    .ticker {
+      background: var(--accent);
+      padding: 0.7rem 0; overflow: hidden;
+    }
+    .ticker-track {
+      display: flex; gap: 3rem;
+      white-space: nowrap;
+      animation: slide 18s linear infinite;
+    }
+    .ticker-item {
+      font-size: 0.85rem; font-weight: 600;
+      color: #fff; letter-spacing: 1px;
+      text-transform: uppercase;
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .ticker-item::after { content: '✦'; opacity: 0.6; }
+    @keyframes slide { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* SECTIONS */
+    section { padding: 5rem 3rem; max-width: 1100px; margin: 0 auto; }
+    .section-label {
+      font-size: 0.75rem; letter-spacing: 3px;
+      text-transform: uppercase; color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+    .section-title {
+      font-size: 2rem; font-weight: 800;
+      margin-bottom: 3rem;
+    }
+
+    /* PROJECTS */
+    .projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+    .project-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.75rem;
+      transition: border-color .2s, transform .2s;
+    }
+    .project-card:hover { border-color: var(--accent); transform: translateY(-4px); }
+    .project-num {
+      font-size: 0.75rem; color: var(--accent);
+      letter-spacing: 2px; margin-bottom: 0.75rem;
+    }
+    .project-name { font-size: 1.15rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .project-desc { font-size: 0.9rem; color: var(--muted); margin-bottom: 1.25rem; line-height: 1.7; }
+    .project-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .tag {
+      background: rgba(79,142,255,0.1);
+      border: 1px solid rgba(79,142,255,0.2);
+      color: var(--accent2); padding: 0.2rem 0.7rem;
+      border-radius: 4px; font-size: 0.75rem;
+    }
+
+    /* SKILLS */
+    .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; }
+    .skill-group h3 { font-size: 0.85rem; color: var(--accent); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 1rem; }
+    .skill-list { display: flex; flex-direction: column; gap: 0.5rem; }
+    .skill-item {
+      background: var(--card); border: 1px solid var(--border);
+      padding: 0.5rem 0.9rem; border-radius: 6px;
+      font-size: 0.875rem; color: var(--text);
+    }
+
+    /* CONTACT */
+    .contact-block {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 3rem;
+      text-align: center;
+    }
+    .contact-block h2 { font-size: 2rem; margin-bottom: 1rem; }
+    .contact-block p { color: var(--muted); max-width: 400px; margin: 0 auto 2rem; }
+    .contact-links { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .contact-link {
+      display: flex; align-items: center; gap: 0.5rem;
+      background: var(--bg2); border: 1px solid var(--border);
+      padding: 0.6rem 1.25rem; border-radius: 8px;
+      color: var(--text); text-decoration: none; font-size: 0.9rem;
+      transition: border-color .2s;
+    }
+    .contact-link:hover { border-color: var(--accent); color: var(--accent); }
+
+    footer {
+      text-align: center; padding: 2rem;
+      color: var(--muted); font-size: 0.8rem;
+      border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">AB</div>
+  <div class="nav-links">
+    <a href="#projects">Projects</a>
+    <a href="#skills">Skills</a>
+    <a href="#education">Education</a>
+    <a href="#contact">Contact</a>
+  </div>
+</nav>
+
+<div style="max-width:1100px;margin:0 auto;">
+  <div class="hero">
+    <div class="hero-text">
+      <div class="hero-tag">Open to opportunities</div>
+      <h1>ANTONIO<br><span>BURGOV</span></h1>
+      <p class="hero-role">Software Developer · ABAP · JavaScript · React</p>
+      <p class="hero-bio">Enthusiastic software engineer passionate about seamless user experiences, front-end optimization, and agile development. Currently growing at Commerzbank.</p>
+      <div class="hero-cta">
+        <a href="#projects" class="btn btn-primary">View Projects</a>
+        <a href="#contact" class="btn btn-outline">Get in Touch</a>
+      </div>
+    </div>
+    <div class="hero-photo">
+      <div class="photo-placeholder">
+        <div class="icon">👤</div>
+        <div>Your photo here</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="ticker">
+  <div class="ticker-track">
+    <span class="ticker-item">JavaScript</span>
+    <span class="ticker-item">Angular</span>
+    <span class="ticker-item">React</span>
+    <span class="ticker-item">SAP ABAP</span>
+    <span class="ticker-item">Node.js</span>
+    <span class="ticker-item">MongoDB</span>
+    <span class="ticker-item">TypeScript</span>
+    <span class="ticker-item">MySQL</span>
+    <span class="ticker-item">Express.js</span>
+    <span class="ticker-item">Agile</span>
+    <!-- duplicate for seamless loop -->
+    <span class="ticker-item">JavaScript</span>
+    <span class="ticker-item">Angular</span>
+    <span class="ticker-item">React</span>
+    <span class="ticker-item">SAP ABAP</span>
+    <span class="ticker-item">Node.js</span>
+    <span class="ticker-item">MongoDB</span>
+    <span class="ticker-item">TypeScript</span>
+    <span class="ticker-item">MySQL</span>
+    <span class="ticker-item">Express.js</span>
+    <span class="ticker-item">Agile</span>
+  </div>
+</div>
+
+<section id="projects" style="max-width:1100px;margin:0 auto;">
+  <div class="section-label">// work</div>
+  <div class="section-title">Projects</div>
+  <div class="projects-grid">
+    <div class="project-card">
+      <div class="project-num">01</div>
+      <div class="project-name">Food Store</div>
+      <div class="project-desc">E-commerce single-page application. Full product listing, cart, and checkout flow built with Angular and TypeScript.</div>
+      <div class="project-tags">
+        <span class="tag">Angular</span><span class="tag">TypeScript</span><span class="tag">SPA</span>
+      </div>
+    </div>
+    <div class="project-card">
+      <div class="project-num">02</div>
+      <div class="project-name">Calculator</div>
+      <div class="project-desc">Built to sharpen logical and analytical thinking. Clean React implementation with a focus on component design.</div>
+      <div class="project-tags">
+        <span class="tag">React</span><span class="tag">JavaScript</span>
+      </div>
+    </div>
+    <div class="project-card">
+      <div class="project-num">03</div>
+      <div class="project-name">Social Media App</div>
+      <div class="project-desc">Full-stack social platform inspired by major networks. Covers modules, architecture, and the real complexity of building social features.</div>
+      <div class="project-tags">
+        <span class="tag">Node.js</span><span class="tag">MongoDB</span><span class="tag">Express</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="skills" style="max-width:1100px;margin:0 auto;">
+  <div class="section-label">// abilities</div>
+  <div class="section-title">Skills</div>
+  <div class="skills-grid">
+    <div class="skill-group">
+      <h3>Technical</h3>
+      <div class="skill-list">
+        <div class="skill-item">JavaScript</div>
+        <div class="skill-item">Angular / React</div>
+        <div class="skill-item">SAP ABAP</div>
+        <div class="skill-item">Node.js / Express</div>
+        <div class="skill-item">MongoDB / MySQL</div>
+        <div class="skill-item">TypeScript</div>
+      </div>
+    </div>
+    <div class="skill-group">
+      <h3>Professional</h3>
+      <div class="skill-list">
+        <div class="skill-item">Agile / Scrum</div>
+        <div class="skill-item">Leadership</div>
+        <div class="skill-item">Critical Thinking</div>
+        <div class="skill-item">Team Collaboration</div>
+        <div class="skill-item">Time Management</div>
+      </div>
+    </div>
+    <div class="skill-group">
+      <h3>Languages</h3>
+      <div class="skill-list">
+        <div class="skill-item">English — C1</div>
+        <div class="skill-item">German — B2</div>
+        <div class="skill-item">Bulgarian — Native</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="education" style="max-width:1100px;margin:0 auto;">
+  <div class="section-label">// background</div>
+  <div class="section-title">Education</div>
+  <div style="display:flex;flex-direction:column;gap:1.5rem;">
+    <div class="project-card">
+      <div class="project-num">2023 – present</div>
+      <div class="project-name">Technical University of Sofia</div>
+      <div class="project-desc">Bachelor's degree in Computer Science</div>
+    </div>
+    <div class="project-card">
+      <div class="project-num">2018 – 2023</div>
+      <div class="project-name">Language High School Plovdiv</div>
+      <div class="project-desc">High school diploma with specialisation in German, English and Mathematics</div>
+    </div>
+    <div class="project-card">
+      <div class="project-num">Certification</div>
+      <div class="project-name">SoftUni — JavaScript</div>
+      <div class="project-desc">JavaScript fundamentals, async programming, Node.js, MongoDB, RESTful APIs, Agile methodologies</div>
+    </div>
+  </div>
+</section>
+
+<section id="contact" style="max-width:1100px;margin:0 auto;">
+  <div class="contact-block">
+    <div class="section-label">// let's talk</div>
+    <h2>Get In Touch</h2>
+    <p>Open to new opportunities, collaborations, and interesting conversations.</p>
+    <div class="contact-links">
+      <a href="mailto:antonioburgov04@gmail.com" class="contact-link">✉ Email</a>
+      <a href="https://github.com/AntonioBurgov" class="contact-link">⌥ GitHub</a>
+      <a href="https://www.linkedin.com/in/antonio-burgov-449bb1255/" class="contact-link">in LinkedIn</a>
+    </div>
+  </div>
+</section>
+
+<footer>© 2026 Antonio Burgov — Sofia, Bulgaria</footer>
+
+</body>
+</html>

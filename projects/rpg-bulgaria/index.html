@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Легенди на България — Образователна RPG (Demo)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=PT+Serif:wght@700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  :root{
+    --gold:#C8860A; --gold-light:#FFD54F; --dark-bg:#1A0A00; --dark-mid:#2E1A00;
+    --dark-card:#1E1200; --text-light:#F5E6C8; --text-muted:#888888;
+    --thrace:#C8860A; --bulgar:#2E7D32; --medieval:#1B4F8A;
+    --green:#2E7D32; --red:#B71C1C;
+  }
+  body{
+    font-family:'PT Sans', system-ui, sans-serif; color:var(--text-light);
+    background:radial-gradient(circle at 50% -10%, #3a2200 0%, var(--dark-bg) 60%);
+    min-height:100vh; display:flex; align-items:center; justify-content:center; padding:16px;
+  }
+  h1,h2,h3,.serif{ font-family:'PT Serif', serif; }
+  button{ font-family:inherit; cursor:pointer; }
+
+  /* phone-app frame */
+  .phone{
+    width:100%; max-width:440px; height:min(860px, 96vh); background:var(--dark-bg);
+    border:1px solid #4a3000; border-radius:28px; overflow:hidden; position:relative;
+    box-shadow:0 30px 80px rgba(0,0,0,0.6), inset 0 0 60px rgba(0,0,0,0.5);
+    display:flex; flex-direction:column;
+  }
+
+  .screen{ position:absolute; inset:0; display:none; flex-direction:column; }
+  .screen.active{ display:flex; }
+  .scroll{ flex:1; overflow-y:auto; }
+  .scroll::-webkit-scrollbar{ width:0; }
+
+  /* ───── SPLASH ───── */
+  #s-splash{ align-items:center; justify-content:center; text-align:center; padding:2rem;
+    background:radial-gradient(circle at 50% 35%, rgba(200,134,10,0.22) 0%, transparent 60%); }
+  .crest{ font-size:5rem; margin-bottom:1rem; filter:drop-shadow(0 4px 14px rgba(0,0,0,0.6)); animation:float 3s ease-in-out infinite; }
+  @keyframes float{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-10px); } }
+  #s-splash h1{ font-size:2.2rem; line-height:1.15; letter-spacing:1px; margin-bottom:0.6rem;
+    background:linear-gradient(180deg,var(--gold-light),var(--gold)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+  .tagline{ color:var(--text-light); opacity:0.7; font-size:0.95rem; margin-bottom:0.4rem; }
+  .flag{ width:70px; height:4px; margin:1.4rem auto 2rem; border-radius:2px; overflow:hidden; display:flex; }
+  .flag i{ flex:1; } .flag .w{ background:#fff; } .flag .g{ background:var(--bulgar); } .flag .r{ background:var(--red); }
+  .btn-gold{ background:linear-gradient(180deg,var(--gold-light),var(--gold)); color:#1a0a00; border:none;
+    padding:0.95rem 2.4rem; border-radius:24px; font-weight:700; font-size:1rem; letter-spacing:0.5px;
+    box-shadow:0 6px 20px rgba(200,134,10,0.4); transition:transform .2s; }
+  .btn-gold:hover{ transform:translateY(-2px) scale(1.02); }
+  .splash-foot{ position:absolute; bottom:16px; font-size:0.72rem; color:var(--gold); opacity:0.5; }
+
+  /* ───── HEADER (shared) ───── */
+  .topbar{ display:flex; align-items:center; gap:0.7rem; padding:1rem 1.2rem; background:var(--dark-mid);
+    border-bottom:1px solid rgba(200,134,10,0.25); flex-shrink:0; }
+  .topbar .back{ background:transparent; border:1px solid var(--gold); color:var(--gold-light); width:34px; height:34px; border-radius:9px; font-size:1rem; flex-shrink:0; }
+  .topbar .title{ font-family:'PT Serif'; color:var(--gold-light); font-size:1.05rem; flex:1; }
+  .hud{ display:flex; gap:0.5rem; }
+  .hud .chip{ background:rgba(200,134,10,0.15); border:1px solid rgba(200,134,10,0.4); border-radius:20px; padding:0.25rem 0.7rem; font-size:0.78rem; font-weight:700; color:var(--gold-light); display:flex; align-items:center; gap:0.3rem; white-space:nowrap; }
+
+  /* ───── HERO SELECT ───── */
+  #s-hero .scroll{ padding:1.4rem 1.2rem; }
+  .pick-head{ text-align:center; margin-bottom:1.4rem; }
+  .pick-head h2{ color:var(--gold-light); font-size:1.4rem; margin-bottom:0.3rem; }
+  .pick-head p{ color:var(--text-muted); font-size:0.85rem; }
+  .hero-card{ background:linear-gradient(135deg,var(--dark-card),var(--dark-mid)); border:1.5px solid rgba(200,134,10,0.3);
+    border-radius:16px; padding:1.2rem; margin-bottom:1rem; display:flex; gap:1rem; align-items:center; transition:all .2s; }
+  .hero-card:hover{ border-color:var(--gold); transform:translateX(4px); }
+  .hero-emoji{ font-size:3rem; width:70px; height:70px; border-radius:14px; background:rgba(0,0,0,0.3); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .hero-info{ flex:1; min-width:0; }
+  .hero-info h3{ color:var(--gold-light); font-size:1.1rem; }
+  .hero-epoch{ font-size:0.72rem; color:var(--gold); margin-bottom:0.5rem; }
+  .stat{ display:flex; align-items:center; gap:0.5rem; font-size:0.72rem; margin-bottom:0.15rem; }
+  .stat .lbl{ width:60px; color:var(--text-muted); }
+  .stars{ color:var(--gold); letter-spacing:1px; }
+  .stars .off{ color:#4a3000; }
+  .hero-desc{ font-size:0.78rem; color:var(--text-muted); line-height:1.5; margin-top:0.5rem; }
+
+  /* ───── MAP ───── */
+  #s-map .scroll{ padding:1rem 1.2rem 2rem; }
+  .daily{ background:linear-gradient(135deg, var(--purple,#6A1B9A), #4a1370); border:1px solid #8e44ad; border-radius:14px;
+    padding:0.9rem 1.1rem; margin-bottom:1.2rem; display:flex; align-items:center; gap:0.8rem; }
+  .daily .ic{ font-size:1.6rem; }
+  .daily .d-txt{ flex:1; } .daily .d-txt b{ font-size:0.9rem; color:#fff; } .daily .d-txt span{ font-size:0.72rem; color:rgba(255,255,255,0.7); display:block; }
+  .daily .go{ background:var(--gold-light); color:#1a0a00; border:none; border-radius:16px; padding:0.4rem 0.9rem; font-weight:700; font-size:0.75rem; }
+  .epoch{ margin-bottom:1.6rem; }
+  .epoch-head{ display:flex; align-items:center; gap:0.6rem; margin-bottom:0.9rem; padding-bottom:0.5rem; border-bottom:2px solid; }
+  .epoch-emoji{ font-size:1.6rem; }
+  .epoch-head .e-name{ font-family:'PT Serif'; font-size:1.05rem; flex:1; }
+  .epoch-head .e-period{ font-size:0.68rem; color:var(--text-muted); }
+  .level{ display:flex; align-items:center; gap:0.9rem; background:var(--dark-card); border:1px solid rgba(255,255,255,0.06);
+    border-radius:14px; padding:0.85rem 1rem; margin-bottom:0.6rem; transition:all .2s; position:relative; }
+  .level.open:hover{ border-color:var(--gold); transform:translateX(4px); }
+  .level.locked{ opacity:0.45; }
+  .level .lv-mon{ font-size:1.8rem; width:48px; height:48px; border-radius:12px; background:rgba(0,0,0,0.35); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .level .lv-info{ flex:1; min-width:0; }
+  .level .lv-num{ font-size:0.66rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; }
+  .level .lv-title{ font-size:0.92rem; font-weight:700; color:var(--text-light); }
+  .level .lv-stars{ font-size:0.8rem; color:var(--gold); letter-spacing:1px; margin-top:0.15rem; }
+  .level .lv-stars .off{ color:#3a2800; }
+  .level .lv-lock{ font-size:1.2rem; }
+  .level .lv-play{ color:var(--gold); font-size:1.3rem; }
+
+  /* ───── QUESTION ───── */
+  #s-quiz{ background:radial-gradient(circle at 50% 0%, #2a1800, var(--dark-bg)); }
+  .quiz-top{ padding:1rem 1.2rem 0; flex-shrink:0; }
+  .quiz-bar-row{ display:flex; align-items:center; gap:0.8rem; margin-bottom:0.8rem; }
+  .quiz-bar-row .back{ background:transparent; border:1px solid var(--gold); color:var(--gold-light); width:32px; height:32px; border-radius:8px; }
+  .q-progress{ flex:1; font-size:0.78rem; color:var(--text-muted); }
+  .q-progress b{ color:var(--gold-light); }
+  .timer-track{ height:8px; background:rgba(0,0,0,0.4); border-radius:5px; overflow:hidden; border:1px solid rgba(200,134,10,0.3); }
+  .timer-fill{ height:100%; width:100%; background:linear-gradient(90deg,var(--green),var(--gold-light)); transition:width 1s linear, background .3s; }
+  .timer-fill.warn{ background:linear-gradient(90deg,var(--red),#ff6b35); }
+  .quiz-body{ flex:1; overflow-y:auto; padding:1.4rem 1.2rem; display:flex; flex-direction:column; }
+  .q-monument{ font-size:2.4rem; text-align:center; margin-bottom:0.8rem; }
+  .q-text{ font-family:'PT Serif'; font-size:1.15rem; line-height:1.45; text-align:center; color:var(--text-light); margin-bottom:1.4rem; }
+  .options{ display:flex; flex-direction:column; gap:0.7rem; }
+  .opt{ background:var(--dark-card); border:1.5px solid rgba(200,134,10,0.25); border-radius:14px; padding:1rem 1.1rem;
+    color:var(--text-light); font-size:0.95rem; text-align:left; transition:all .2s; display:flex; align-items:center; gap:0.8rem; }
+  .opt:hover:not(:disabled){ border-color:var(--gold); background:var(--dark-mid); }
+  .opt .key{ width:26px; height:26px; border-radius:50%; background:rgba(200,134,10,0.2); color:var(--gold-light); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.8rem; flex-shrink:0; }
+  .opt.correct{ border-color:var(--green); background:rgba(46,125,50,0.25); }
+  .opt.correct .key{ background:var(--green); color:#fff; }
+  .opt.wrong{ border-color:var(--red); background:rgba(183,28,28,0.22); }
+  .opt.wrong .key{ background:var(--red); color:#fff; }
+  .hint-row{ margin-top:1rem; text-align:center; }
+  .hint-btn{ background:transparent; border:1px dashed var(--gold); color:var(--gold-light); border-radius:20px; padding:0.45rem 1.1rem; font-size:0.8rem; }
+  .hint-text{ margin-top:0.7rem; font-size:0.82rem; color:var(--gold-light); font-style:italic; background:rgba(200,134,10,0.1); border-radius:10px; padding:0.6rem 0.9rem; display:none; }
+  .hint-text.show{ display:block; }
+  .quiz-foot{ padding:1rem 1.2rem; flex-shrink:0; border-top:1px solid rgba(200,134,10,0.15); display:none; }
+  .quiz-foot.show{ display:block; }
+  .feedback{ text-align:center; font-weight:700; font-size:0.95rem; margin-bottom:0.7rem; }
+  .feedback.ok{ color:var(--green); } .feedback.no{ color:#ff6b6b; }
+  .next-btn{ width:100%; background:linear-gradient(180deg,var(--gold-light),var(--gold)); color:#1a0a00; border:none; border-radius:14px; padding:0.9rem; font-weight:700; font-size:0.95rem; }
+
+  /* ───── LEVEL COMPLETE ───── */
+  #s-done{ align-items:center; justify-content:center; text-align:center; padding:2rem;
+    background:radial-gradient(circle at 50% 35%, rgba(200,134,10,0.25), var(--dark-bg) 65%); }
+  .done-title{ font-size:1.8rem; color:var(--gold-light); margin-bottom:0.4rem; }
+  .done-sub{ color:var(--text-muted); margin-bottom:1.6rem; font-size:0.9rem; }
+  .big-stars{ font-size:3rem; letter-spacing:8px; color:var(--gold); margin-bottom:0.4rem; }
+  .big-stars .off{ color:#3a2800; }
+  .done-stats{ display:flex; gap:1rem; justify-content:center; margin:1.4rem 0 2rem; }
+  .done-stat{ background:var(--dark-card); border:1px solid rgba(200,134,10,0.3); border-radius:14px; padding:1rem 1.4rem; min-width:90px; }
+  .done-stat .n{ font-family:'PT Serif'; font-size:1.6rem; color:var(--gold-light); }
+  .done-stat .l{ font-size:0.7rem; color:var(--text-muted); }
+
+  /* star pop animation */
+  @keyframes pop{ 0%{ transform:scale(0); } 70%{ transform:scale(1.3); } 100%{ transform:scale(1); } }
+  .big-stars span{ display:inline-block; animation:pop .4s backwards; }
+  .big-stars span:nth-child(2){ animation-delay:.2s; }
+  .big-stars span:nth-child(3){ animation-delay:.4s; }
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <!-- SPLASH -->
+  <div class="screen active" id="s-splash">
+    <div class="crest">🏰</div>
+    <h1>ЛЕГЕНДИ<br>НА БЪЛГАРИЯ</h1>
+    <div class="tagline">Образователна RPG за българската история</div>
+    <div class="flag"><i class="w"></i><i class="g"></i><i class="r"></i></div>
+    <button class="btn-gold" onclick="show('hero')">Започни играта ⚔️</button>
+    <div class="splash-foot">Тракийска · Прабългарска · Средновековна епоха</div>
+  </div>
+
+  <!-- HERO SELECT -->
+  <div class="screen" id="s-hero">
+    <div class="topbar">
+      <button class="back" onclick="show('splash')">←</button>
+      <span class="title">Избери своя герой</span>
+    </div>
+    <div class="scroll">
+      <div class="pick-head">
+        <p>Всеки герой носи силите на своята епоха</p>
+      </div>
+      <div id="heroList"></div>
+    </div>
+  </div>
+
+  <!-- MAP -->
+  <div class="screen" id="s-map">
+    <div class="topbar">
+      <span class="title">Картата на България</span>
+      <div class="hud">
+        <span class="chip">⭐ <span id="hudPoints">0</span></span>
+        <span class="chip">🔥 <span id="hudStreak">0</span></span>
+      </div>
+    </div>
+    <div class="scroll">
+      <div class="daily" style="--purple:#6A1B9A;">
+        <div class="ic">🎯</div>
+        <div class="d-txt"><b>Дневно предизвикателство</b><span>Тройни точки днес!</span></div>
+        <button class="go" onclick="alert('Демо: дневното предизвикателство дава ×3 точки.')">Играй</button>
+      </div>
+      <div id="epochList"></div>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="screen" id="s-quiz">
+    <div class="quiz-top">
+      <div class="quiz-bar-row">
+        <button class="back" onclick="quitQuiz()">←</button>
+        <div class="q-progress">Въпрос <b id="qNum">1</b> / <span id="qTotal">3</span> · <span id="qLevelTitle"></span></div>
+        <div class="hud"><span class="chip">⭐ <span id="qPoints">0</span></span></div>
+      </div>
+      <div class="timer-track"><div class="timer-fill" id="timerFill"></div></div>
+    </div>
+    <div class="quiz-body">
+      <div class="q-monument" id="qMon">🏛</div>
+      <div class="q-text" id="qText"></div>
+      <div class="options" id="qOptions"></div>
+      <div class="hint-row">
+        <button class="hint-btn" id="hintBtn" onclick="showHint()">💡 Подсказка</button>
+        <div class="hint-text" id="hintText"></div>
+      </div>
+    </div>
+    <div class="quiz-foot" id="quizFoot">
+      <div class="feedback" id="feedback"></div>
+      <button class="next-btn" onclick="nextQuestion()" id="nextBtn">Следващ въпрос →</button>
+    </div>
+  </div>
+
+  <!-- LEVEL COMPLETE -->
+  <div class="screen" id="s-done">
+    <div class="done-title">Ниво завършено!</div>
+    <div class="done-sub" id="doneLevelName"></div>
+    <div class="big-stars" id="doneStars"></div>
+    <div class="done-stats">
+      <div class="done-stat"><div class="n" id="doneCorrect">0/3</div><div class="l">верни</div></div>
+      <div class="done-stat"><div class="n" id="donePoints">0</div><div class="l">точки</div></div>
+    </div>
+    <button class="btn-gold" onclick="show('map')">Към картата 🗺️</button>
+  </div>
+
+</div>
+
+<script>
+  /* ════════ DATA (from the real game) ════════ */
+  const heroes = [
+    {id:'archer',  name:'Стрелецът', emoji:'🏹', epoch:'Тракийска епоха',
+     desc:'Бърз и прецизен тракийски воин, пазител на свещените гробници.',
+     stats:{Бързина:4, Защита:2, Мъдрост:3}},
+    {id:'warrior', name:'Конникът', emoji:'⚔️', epoch:'Прабългарска епоха',
+     desc:'Безстрашен прабългарски воин, израсъл в степите. Защитник на Аспаруховото ханство.',
+     stats:{Бързина:2, Защита:4, Мъдрост:3}},
+    {id:'sage',    name:'Мъдрецът', emoji:'📚', epoch:'Средновековна епоха',
+     desc:'Учен книжовник от Търновската школа, пазител на знанието.',
+     stats:{Бързина:2, Защита:2, Мъдрост:4}},
+  ];
+
+  const epochs = [
+    { id:'thrace', name:'Тракийска епоха', period:'V в. пр. Хр. – I в. сл. Хр.', emoji:'🏺', color:'#C8860A',
+      levels:[
+        { title:'Тракийската гробница', mon:'🏛', q:[
+          {t:'В кой град се намира прочутата Тракийска гробница, включена в ЮНЕСКО?', o:['Казанлък','Пловдив','Велико Търново','Стара Загора'], c:0, h:'Градът е известен с Долината на розите.', p:10},
+          {t:'Как се казва тракийският цар, чиято гробница е намерена край Казанлък?', o:['Ситалкес','Севт III','Котис I','Терес'], c:1, h:'Конната му статуя е намерена в Шипка.', p:15},
+          {t:'Траките са известни майстори на изделия от кой материал?', o:['Дърво','Камък','Злато и сребро','Бронз'], c:2, h:'Панагюрското съкровище е от него.', p:10},
+        ]},
+        { title:'Панагюрското съкровище', mon:'⚱️', q:[
+          {t:'Колко съда съдържа Панагюрското тракийско съкровище?', o:['5','7','9','12'], c:2, h:'Нечетно число, по-голямо от 7.', p:20},
+          {t:"Откъде произхожда думата 'тракийски'?", o:["От гръцкото 'Thrakia'","От латинското 'Trax'",'От персийски','От египетски'], c:0, h:'Траките са съседи на древните гърци.', p:10},
+          {t:'Кой е известният тракийски гладиатор, вдигнал въстание срещу Рим?', o:['Одрис','Буребиста','Спартак','Декебал'], c:2, h:'Известен е от много филми.', p:5},
+        ]},
+        { title:'Тракийските обреди', mon:'🔱', q:[
+          {t:'Кой тракийски бог е смятан за баща на Орфей?', o:['Арес','Аполон','Хермес','Дионис'], c:1, h:'Бог на светлината и музиката.', p:15},
+          {t:'С кой ритуален напитък са свързани траките?', o:['Мед','Вино','Бира','Ракия'], c:1, h:'Почитан от бог Дионис.', p:10},
+        ]},
+        { title:'Тракийски владетели', mon:'👑', q:[
+          {t:'Кой основава Одриското царство – първата тракийска държава?', o:['Терес I','Ситалкес','Котис','Севт'], c:0, h:'Управлявал около 480 г. пр. Хр.', p:20},
+          {t:'Коя е столицата на Одриското царство?', o:['Сердика','Филипопол','Кабиле','Севтополис'], c:3, h:'Построена от Севт III.', p:15},
+        ]},
+      ]},
+    { id:'bulgar', name:'Прабългарска епоха', period:'VII – IX век', emoji:'🐴', color:'#2E7D32',
+      levels:[
+        { title:'Основаване на България', mon:'🏰', q:[
+          {t:'Коя е годината на основаването на Първото българско царство?', o:['681 г.','865 г.','632 г.','716 г.'], c:0, h:'Кан Аспарух победил Византия.', p:20},
+          {t:'Кой е основателят на Дунавска България?', o:['Тервел','Крум','Аспарух','Омуртаг'], c:2, h:'Преминал Дунав с прабългарските племена.', p:10},
+          {t:'Коя е първата столица на България?', o:['Преслав','Търново','Плиска','Охрид'], c:2, h:'В Североизточна България.', p:10},
+        ]},
+        { title:'Кан Крум и Кан Омуртаг', mon:'⚔️', q:[
+          {t:'С кого воюва кан Крум и побеждава при Върбишкия проход?', o:['Карл Велики','Никифор I','Лъв V','Михаил I'], c:1, h:'Византийски император, загинал в битката.', p:20},
+          {t:'На кой хълм е издялан Мадарският конник?', o:['Мадарско плато','Шуменско плато','Провадийско плато','Разградско поле'], c:0, h:'ЮНЕСКО паметник в Североизточна България.', p:15},
+        ]},
+        { title:'Покръстването на България', mon:'✝️', q:[
+          {t:'В коя година се покръства княз Борис I?', o:['681 г.','865 г.','893 г.','927 г.'], c:1, h:'Средата на IX век.', p:15},
+          {t:'Кой създава глаголицата – предшественичката на кирилицата?', o:['Климент Охридски','Наум Охридски','Свети Методий','Свети Кирил'], c:3, h:'По-малкият от двамата братя солунчани.', p:20},
+        ]},
+        { title:'Златният век', mon:'📜', q:[
+          {t:"Чие управление се смята за 'Златен век' на Първото царство?", o:['Борис I','Симеон I','Петър I','Крум'], c:1, h:"Приел титлата 'цар на българи и ромеи'.", p:20},
+          {t:'Коя е новата столица, основана по времето на цар Симеон I?', o:['Плиска','Охрид','Преслав','Търново'], c:2, h:'Център на Златния век.', p:15},
+        ]},
+      ]},
+    { id:'medieval', name:'Средновековна епоха', period:'XII – XIV век', emoji:'🏰', color:'#1B4F8A',
+      levels:[
+        { title:'Въстанието на Асен и Петър', mon:'⚔️', q:[
+          {t:'В коя година започва въстанието на Асен и Петър?', o:['1185 г.','1018 г.','1396 г.','1230 г.'], c:0, h:'Краят на XII век.', p:20},
+          {t:'Коя става столица на Второто българско царство?', o:['Плиска','Преслав','Търново','Охрид'], c:2, h:'Градът на царете.', p:10},
+        ]},
+        { title:'Цар Калоян и цар Иван Асен II', mon:'👑', q:[
+          {t:'Кой цар печели битката при Клокотница (1230)?', o:['Калоян','Иван Асен II','Борил','Калиман'], c:1, h:'Разгромил епирския деспот.', p:20},
+          {t:'Кого пленява цар Калоян в битката при Одрин (1205)?', o:['латинския император Балдуин I','византийския император','сръбския крал','унгарския крал'], c:0, h:'Водач на Четвъртия кръстоносен поход.', p:20},
+        ]},
+        { title:'Търновската книжовна школа', mon:'📖', q:[
+          {t:'Кой е последният български патриарх преди османското завоевание?', o:['Евтимий Търновски','Йоаким I','Игнатий','Киприан'], c:0, h:'Реформатор на българския правопис.', p:20},
+        ]},
+        { title:'Падането под османска власт', mon:'⚔️', q:[
+          {t:'В коя година пада Търново под османска власт?', o:['1393 г.','1396 г.','1018 г.','1422 г.'], c:0, h:'Краят на XIV век.', p:20},
+        ]},
+      ]},
+  ];
+
+  /* ════════ STATE ════════ */
+  let hero = null;
+  let points = 0, streak = 0;
+  const progress = {}; // "epochIdx-levelIdx" -> stars earned
+  let cur = { ei:0, li:0, qi:0, correct:0, earned:0, answered:false, timer:null, timeLeft:30 };
+
+  function keyOf(ei,li){ return ei+'-'+li; }
+  function isUnlocked(ei,li){
+    if(li===0) return true;                       // first level of every epoch open
+    return progress[keyOf(ei,li-1)] !== undefined; // previous level completed
+  }
+
+  /* ════════ NAV ════════ */
+  function show(s){
+    document.querySelectorAll('.screen').forEach(el=>el.classList.remove('active'));
+    document.getElementById('s-'+s).classList.add('active');
+    if(s==='hero') renderHeroes();
+    if(s==='map') renderMap();
+  }
+
+  /* ════════ HERO SELECT ════════ */
+  function starStr(n,max){ let s=''; for(let i=0;i<max;i++) s += i<n?'★':'<span class="off">★</span>'; return s; }
+  function renderHeroes(){
+    document.getElementById('heroList').innerHTML = heroes.map(h=>`
+      <div class="hero-card" onclick="pickHero('${h.id}')">
+        <div class="hero-emoji">${h.emoji}</div>
+        <div class="hero-info">
+          <h3>${h.name}</h3>
+          <div class="hero-epoch">${h.epoch}</div>
+          ${Object.entries(h.stats).map(([k,v])=>`<div class="stat"><span class="lbl">${k}</span><span class="stars">${starStr(v,4)}</span></div>`).join('')}
+          <div class="hero-desc">${h.desc}</div>
+        </div>
+      </div>`).join('');
+  }
+  function pickHero(id){ hero = heroes.find(h=>h.id===id); show('map'); }
+
+  /* ════════ MAP ════════ */
+  function renderMap(){
+    document.getElementById('hudPoints').textContent = points;
+    document.getElementById('hudStreak').textContent = streak;
+    document.getElementById('epochList').innerHTML = epochs.map((ep,ei)=>`
+      <div class="epoch">
+        <div class="epoch-head" style="border-color:${ep.color};">
+          <span class="epoch-emoji">${ep.emoji}</span>
+          <span class="e-name" style="color:${ep.color===''?'':'var(--gold-light)'}">${ep.name}</span>
+          <span class="e-period">${ep.period}</span>
+        </div>
+        ${ep.levels.map((lv,li)=>{
+          const open = isUnlocked(ei,li);
+          const stars = progress[keyOf(ei,li)];
+          return `<div class="level ${open?'open':'locked'}" ${open?`onclick="startLevel(${ei},${li})"`:''}>
+            <div class="lv-mon" style="${open?`box-shadow:inset 0 0 0 2px ${ep.color}55;`:''}">${open?lv.mon:'🔒'}</div>
+            <div class="lv-info">
+              <div class="lv-num">Ниво ${li+1}</div>
+              <div class="lv-title">${lv.title}</div>
+              ${stars!==undefined ? `<div class="lv-stars">${starStr(stars,3)}</div>` : (open?'<div class="lv-stars"><span class="off">★★★</span></div>':'')}
+            </div>
+            ${open ? (stars!==undefined?'<span class="lv-play">↻</span>':'<span class="lv-play">▶</span>') : '<span class="lv-lock">🔒</span>'}
+          </div>`;
+        }).join('')}
+      </div>`).join('');
+  }
+
+  /* ════════ QUIZ ════════ */
+  function startLevel(ei,li){
+    cur = { ei, li, qi:0, correct:0, earned:0, answered:false, timer:null, timeLeft:30 };
+    const lv = epochs[ei].levels[li];
+    document.getElementById('qTotal').textContent = lv.q.length;
+    document.getElementById('qLevelTitle').textContent = lv.title;
+    document.getElementById('qMon').textContent = lv.mon;
+    show('quiz');
+    renderQuestion();
+  }
+  function renderQuestion(){
+    const lv = epochs[cur.ei].levels[cur.li];
+    const q = lv.q[cur.qi];
+    cur.answered = false;
+    document.getElementById('qNum').textContent = cur.qi+1;
+    document.getElementById('qPoints').textContent = points;
+    document.getElementById('qText').textContent = q.t;
+    document.getElementById('qOptions').innerHTML = q.o.map((opt,i)=>
+      `<button class="opt" onclick="answer(${i})"><span class="key">${String.fromCharCode(65+i)}</span>${opt}</button>`).join('');
+    document.getElementById('hintText').textContent = '💡 '+q.h;
+    document.getElementById('hintText').classList.remove('show');
+    document.getElementById('hintBtn').style.display='inline-block';
+    document.getElementById('quizFoot').classList.remove('show');
+    startTimer();
+  }
+  function startTimer(){
+    cur.timeLeft = 30;
+    const fill = document.getElementById('timerFill');
+    fill.classList.remove('warn'); fill.style.transition='none'; fill.style.width='100%';
+    void fill.offsetWidth; fill.style.transition='width 1s linear';
+    clearInterval(cur.timer);
+    cur.timer = setInterval(()=>{
+      cur.timeLeft--;
+      fill.style.width = (cur.timeLeft/30*100)+'%';
+      if(cur.timeLeft<=10) fill.classList.add('warn');
+      if(cur.timeLeft<=0){ clearInterval(cur.timer); answer(-1); }
+    },1000);
+  }
+  function showHint(){ document.getElementById('hintText').classList.add('show'); document.getElementById('hintBtn').style.display='none'; }
+  function answer(i){
+    if(cur.answered) return; cur.answered=true;
+    clearInterval(cur.timer);
+    const lv = epochs[cur.ei].levels[cur.li];
+    const q = lv.q[cur.qi];
+    const btns = document.querySelectorAll('#qOptions .opt');
+    btns.forEach((b,idx)=>{ b.disabled=true; if(idx===q.c) b.classList.add('correct'); if(idx===i && i!==q.c) b.classList.add('wrong'); });
+    const fb = document.getElementById('feedback');
+    if(i===q.c){
+      const gained = q.p; points += gained; cur.earned += gained; cur.correct++; streak++;
+      fb.className='feedback ok'; fb.textContent = `Вярно! +${gained} точки 🎉` + (streak>1?`  (серия ${streak}🔥)`:'');
+    } else {
+      streak = 0;
+      fb.className='feedback no';
+      fb.textContent = i===-1 ? '⏱ Времето изтече!' : 'Грешно! Верният отговор е маркиран.';
+    }
+    document.getElementById('qPoints').textContent = points;
+    document.getElementById('nextBtn').textContent = (cur.qi < lv.q.length-1) ? 'Следващ въпрос →' : 'Завърши нивото ✓';
+    document.getElementById('quizFoot').classList.add('show');
+  }
+  function nextQuestion(){
+    const lv = epochs[cur.ei].levels[cur.li];
+    if(cur.qi < lv.q.length-1){ cur.qi++; renderQuestion(); }
+    else finishLevel();
+  }
+  function quitQuiz(){ clearInterval(cur.timer); show('map'); }
+
+  /* ════════ LEVEL COMPLETE ════════ */
+  function finishLevel(){
+    clearInterval(cur.timer);
+    const lv = epochs[cur.ei].levels[cur.li];
+    const total = lv.q.length;
+    const ratio = cur.correct/total;
+    let stars = ratio===1 ? 3 : ratio>=0.6 ? 2 : ratio>0 ? 1 : 0;
+    const prev = progress[keyOf(cur.ei,cur.li)];
+    if(prev===undefined || stars>prev) progress[keyOf(cur.ei,cur.li)] = stars;
+    document.getElementById('doneLevelName').textContent = epochs[cur.ei].emoji+' '+lv.title;
+    document.getElementById('doneStars').innerHTML = [0,1,2].map(i=>`<span>${i<stars?'★':'<span class="off">★</span>'}</span>`).join('');
+    document.getElementById('doneCorrect').textContent = cur.correct+'/'+total;
+    document.getElementById('donePoints').textContent = '+'+cur.earned;
+    show('done');
+  }
+</script>
+</body>
+</html>
