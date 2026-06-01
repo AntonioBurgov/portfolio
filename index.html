@@ -32,6 +32,11 @@
 
       --font-head: 'Space Grotesk', system-ui, sans-serif;
       --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+
+      /* saved hero-photo placement */
+      --photo-size: 720px;
+      --photo-x: 220px;
+      --photo-y: 144px;
     }
 
     [data-theme="dark"] {
@@ -198,7 +203,7 @@
     .hero-soc:hover { background: #fff; color: var(--blue); transform: translateY(-3px); }
 
     .hero-photo {
-      flex-shrink: 0; width: 440px;
+      flex-shrink: 0;
       display: flex; align-items: flex-end; justify-content: center;
       position: relative;
     }
@@ -207,8 +212,10 @@
       border-radius: 50%; background: rgba(255,255,255,0.10);
     }
     .hero-photo img {
-      position: relative; z-index: 1; width: 100%; max-height: 560px;
+      position: relative; z-index: 1;
+      width: var(--photo-size, 520px); height: auto; max-height: 80vh;
       object-fit: contain; object-position: bottom;
+      transform: translate(var(--photo-x, 0px), var(--photo-y, 0px));
       filter: drop-shadow(0 30px 50px rgba(0,0,0,0.30));
     }
     .photo-ph {
@@ -360,22 +367,22 @@
     }
     .modal-bg.open { display: flex; }
     .modal {
-      background: var(--bg); border-radius: 18px; width: 100%; max-width: 1080px;
-      max-height: 90vh; display: flex; flex-direction: column; overflow: hidden;
-      box-shadow: 0 40px 90px rgba(0,0,0,0.4); border: 1px solid var(--border);
+      background: var(--bg); border-radius: 20px; width: 100%; max-width: 760px;
+      max-height: 94vh; display: flex; flex-direction: column; overflow: hidden;
+      box-shadow: 0 40px 90px rgba(0,0,0,0.45); border: 1px solid var(--border);
     }
     .modal-top {
       padding: 1rem 1.4rem; display: flex; align-items: center; justify-content: space-between;
       border-bottom: 1px solid var(--border); gap: 1rem; flex-wrap: wrap;
     }
-    .modal-top h4 { font-family: var(--font-head); font-size: 1rem; color: var(--ink); }
-    .device-switch { display: flex; gap: 0.3rem; background: var(--bg-alt); padding: 0.3rem; border-radius: 10px; }
-    .device-switch button {
-      border: none; background: transparent; cursor: pointer; padding: 0.4rem 0.9rem;
-      border-radius: 7px; font-size: 0.85rem; color: var(--muted); font-family: var(--font-body);
-      font-weight: 600; transition: all .2s; display: flex; align-items: center; gap: 0.35rem;
+    .modal-top h4 { font-family: var(--font-head); font-size: 1rem; color: var(--ink); margin-right: auto; }
+    .open-full {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      background: var(--bg-alt); border: 1px solid var(--border); color: var(--ink);
+      text-decoration: none; padding: 0.45rem 0.95rem; border-radius: 8px;
+      font-size: 0.82rem; font-weight: 600; transition: all .2s; white-space: nowrap;
     }
-    .device-switch button.active { background: var(--blue); color: #fff; }
+    .open-full:hover { border-color: var(--blue); color: var(--blue); }
     .modal-close {
       width: 36px; height: 36px; border-radius: 50%; border: none; cursor: pointer;
       background: var(--bg-alt); color: var(--ink); font-size: 1.1rem;
@@ -383,14 +390,39 @@
     }
     .modal-close:hover { background: var(--border); }
     .modal-stage {
-      flex: 1; background: var(--bg-alt); padding: 1.6rem; overflow: auto;
-      display: flex; align-items: flex-start; justify-content: center; min-height: 420px;
+      flex: 1; overflow: auto; padding: 1.8rem 1.6rem;
+      display: flex; align-items: center; justify-content: center; min-height: 420px;
+      background: radial-gradient(circle at 50% 26%, rgba(67,83,255,0.14), var(--bg-alt) 72%);
     }
-    .device-frame {
-      background: #fff; border-radius: 12px; overflow: hidden; transition: width .4s ease, max-width .4s ease;
-      width: 100%; box-shadow: 0 10px 40px rgba(0,0,0,0.15); border: 1px solid var(--border);
+    /* iPhone mockup — the app runs inside */
+    .iphone {
+      position: relative; flex-shrink: 0;
+      height: min(680px, 78vh); width: calc(min(680px, 78vh) * 0.486);
+      background: linear-gradient(145deg, #2c2c30, #0e0e10);
+      border-radius: 52px; padding: 13px;
+      box-shadow: 0 0 0 2px #3a3a40, 0 0 0 6px #141416, 0 30px 70px rgba(0,0,0,0.55);
+      animation: phonePop .5s cubic-bezier(.2,.9,.3,1.25);
     }
-    .device-frame iframe { width: 100%; height: 560px; border: none; display: block; background: #fff; }
+    @keyframes phonePop { from { opacity: 0; transform: translateY(34px) scale(.92); } to { opacity: 1; transform: none; } }
+    .iphone-screen {
+      width: 100%; height: 100%; background: #fff;
+      border-radius: 40px; overflow: hidden; position: relative;
+    }
+    .iphone-screen iframe { width: 100%; height: 100%; border: 0; display: block; background: #fff; }
+    .iphone-island {
+      position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+      width: 104px; height: 29px; background: #000; border-radius: 16px; z-index: 10;
+    }
+    .iphone::before { content: ''; position: absolute; right: -3px; top: 175px; width: 3px; height: 66px; background: #2c2c30; border-radius: 0 3px 3px 0; }
+    .iphone::after  { content: ''; position: absolute; left: -3px; top: 135px; width: 3px; height: 38px; background: #2c2c30; border-radius: 3px 0 0 3px; box-shadow: 0 52px 0 #2c2c30; }
+    /* leasing already includes its own phone chrome → show directly */
+    .bare-frame {
+      width: min(430px, 92vw); height: min(810px, 80vh);
+      border-radius: 20px; overflow: hidden; flex-shrink: 0;
+      box-shadow: 0 30px 70px rgba(0,0,0,0.5);
+      animation: phonePop .5s cubic-bezier(.2,.9,.3,1.25);
+    }
+    .bare-frame iframe { width: 100%; height: 100%; border: 0; display: block; background: #0F172A; }
     .demo-ph {
       width: 100%; min-height: 420px; display: flex; flex-direction: column;
       align-items: center; justify-content: center; gap: 0.8rem; color: var(--muted); text-align: center; padding: 2rem;
@@ -463,7 +495,8 @@
       .hero-inner { flex-direction: column-reverse; text-align: center; gap: 2.5rem; }
       .hero-text p { margin-left: auto; margin-right: auto; }
       .hero-actions { justify-content: center; }
-      .hero-photo { width: 240px; }
+      .hero-photo img { width: min(var(--photo-size, 520px), 66vw); max-height: 58vh; transform: none; }
+      .hero-photo .ring { width: 230px; height: 230px; }
       .photo-ph { width: 220px; height: 300px; }
       .scroll-cue { display: none; }
       .about-grid { grid-template-columns: 1fr; gap: 2.5rem; }
@@ -475,9 +508,11 @@
       .proj-grid { grid-template-columns: 1fr; }
       .skill-cols { grid-template-columns: 1fr; gap: 1.8rem; }
       .hero-text h1 { font-size: 2.4rem; }
-      .modal-top { flex-direction: column; align-items: stretch; }
-      .device-switch { justify-content: center; }
+      .modal-bg { padding: 1rem; }
+      .modal-top { gap: 0.6rem; }
+      .open-full { display: none; }
     }
+
   </style>
 </head>
 <body>
@@ -596,7 +631,7 @@
     <div class="sec-head reveal">
       <span class="eyebrow">Work</span>
       <h2 class="sec-title">Projects you can actually try</h2>
-      <p class="sec-sub">Hover a project and hit <b>Try it live</b> — each demo opens in a viewer where you can switch between desktop, tablet, and mobile to see the responsive design in action.</p>
+      <p class="sec-sub">Hover a project and hit <b>Try it live</b> — each one opens running inside an iPhone you can actually use, right here on the page. (Tap <b>Open full version</b> for the full-screen experience.)</p>
     </div>
     <div class="proj-grid">
 
@@ -766,55 +801,46 @@
   <div class="modal">
     <div class="modal-top">
       <h4 id="modalTitle">Project</h4>
-      <div class="device-switch">
-        <button data-w="100%" class="active" onclick="setDevice(this,'100%')">🖥 Desktop</button>
-        <button data-w="768px" onclick="setDevice(this,'768px')">📱 Tablet</button>
-        <button data-w="375px" onclick="setDevice(this,'375px')">📲 Mobile</button>
-      </div>
+      <a id="openFull" class="open-full" href="#" target="_blank" rel="noopener">Open full version ↗</a>
       <button class="modal-close" onclick="closeDemo()" aria-label="Close">✕</button>
     </div>
-    <div class="modal-stage">
-      <div class="device-frame" id="frameWrap" style="max-width:100%;">
-        <!-- iframe injected here, or placeholder -->
-        <div class="demo-ph" id="demoPh">
-          <div class="big">🚀</div>
-          <p><b id="phName">This project</b> isn't hosted yet.</p>
-          <p style="font-size:0.88rem;max-width:380px;">Once you deploy it, add the URL to the <code>demos</code> object in the script — it'll appear right here, fully interactive.</p>
-          <a id="phLink" href="https://github.com/AntonioBurgov" target="_blank">View the code on GitHub →</a>
-        </div>
-      </div>
-    </div>
+    <div class="modal-stage" id="modalStage"></div>
   </div>
 </div>
 
 <script>
   /* ─── Demo data — add a `url` once each project is hosted ─── */
   const demos = {
-    food:    { title: 'FoodGo — Food Delivery',        url: 'projects/food-store/index.html' },
-    leasing: { title: 'ЛизингПро — Digital Leasing',   url: 'projects/leasing/index.html' },
-    rpg:     { title: 'Легенди на България — History RPG', url: 'projects/rpg-bulgaria/index.html' }
+    food:    { title: 'FoodGo — Food Delivery',            url: 'projects/food-store/index.html',  frame: 'iphone' },
+    leasing: { title: 'ЛизингПро — Digital Leasing',       url: 'projects/leasing/index.html',      frame: 'bare' },
+    rpg:     { title: 'Легенди на България — History RPG', url: 'projects/rpg-bulgaria/index.html', frame: 'iphone' }
   };
 
   const modal = document.getElementById('modal');
-  const frameWrap = document.getElementById('frameWrap');
+  const stage = document.getElementById('modalStage');
 
   function openDemo(id) {
     const d = demos[id];
     document.getElementById('modalTitle').textContent = d.title;
-    // reset device to desktop
-    document.querySelectorAll('.device-switch button').forEach(b => b.classList.toggle('active', b.dataset.w === '100%'));
-    frameWrap.style.maxWidth = '100%';
+    const full = document.getElementById('openFull');
+    if (d.url) { full.href = d.url; full.style.display = ''; } else { full.style.display = 'none'; }
 
-    if (d.url) {
-      frameWrap.innerHTML = '<iframe src="' + d.url + '" title="' + d.title + '" loading="lazy"></iframe>';
-    } else {
-      frameWrap.innerHTML = '' +
+    if (!d.url) {
+      stage.innerHTML =
         '<div class="demo-ph">' +
           '<div class="big">🚀</div>' +
-          '<p><b>' + d.title.replace(' — Live Demo','') + '</b> isn\'t hosted yet.</p>' +
-          '<p style="font-size:0.88rem;max-width:380px;">Once you deploy it, add its URL to the <code>demos</code> object in the script and it will appear right here — fully interactive and responsive.</p>' +
-          '<a href="https://github.com/AntonioBurgov" target="_blank">View the code on GitHub →</a>' +
+          '<p><b>' + d.title + '</b> isn\'t hosted yet.</p>' +
+          '<p style="font-size:0.88rem;max-width:380px;">Add its URL to the <code>demos</code> object and it appears right here.</p>' +
+          '<a href="https://github.com/AntonioBurgov" target="_blank" rel="noopener">View the code on GitHub →</a>' +
         '</div>';
+    } else if (d.frame === 'iphone') {
+      stage.innerHTML =
+        '<div class="iphone"><div class="iphone-island"></div>' +
+          '<div class="iphone-screen"><iframe src="' + d.url + '" title="' + d.title + '" loading="lazy"></iframe></div>' +
+        '</div>';
+    } else {
+      stage.innerHTML =
+        '<div class="bare-frame"><iframe src="' + d.url + '" title="' + d.title + '" loading="lazy"></iframe></div>';
     }
     modal.classList.add('open');
     document.body.style.overflow = 'hidden';
@@ -822,12 +848,7 @@
   function closeDemo() {
     modal.classList.remove('open');
     document.body.style.overflow = '';
-    frameWrap.innerHTML = ''; // stop any playing demo
-  }
-  function setDevice(btn, w) {
-    document.querySelectorAll('.device-switch button').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    frameWrap.style.maxWidth = w;
+    stage.innerHTML = ''; // stop any running demo
   }
   modal.addEventListener('click', e => { if (e.target === modal) closeDemo(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDemo(); });
