@@ -306,12 +306,32 @@
       display: flex; align-items: center; justify-content: center;
     }
     [data-theme="dark"] .proj-thumb { background: linear-gradient(135deg, #1a2236, #1f2942); }
-    .proj-thumb .emoji { font-size: 3.2rem; transition: transform .35s; }
-    .proj:hover .proj-thumb .emoji { transform: scale(1.15) rotate(-5deg); }
+    /* live mini-preview of the real project */
+    .thumb-frame {
+      position: absolute; top: 0; left: 0;
+      width: 333.33%; height: 333.33%;
+      transform: scale(0.3); transform-origin: top left;
+      border: 0; pointer-events: none; background: #fff;
+    }
+    .thumb-badge {
+      position: absolute; top: 10px; left: 10px; z-index: 2;
+      width: 38px; height: 38px; border-radius: 10px;
+      background: rgba(255,255,255,0.92);
+      display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+    }
+    .thumb-live {
+      position: absolute; top: 12px; right: 12px; z-index: 2;
+      display: flex; align-items: center; gap: 0.35rem;
+      background: rgba(17,24,39,0.72); color: #fff;
+      padding: 0.22rem 0.6rem; border-radius: 20px;
+      font-size: 0.62rem; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase;
+    }
+    .thumb-live .live-dot { width: 6px; height: 6px; border-radius: 50%; background: #34d399; }
     .proj-thumb .overlay {
       position: absolute; inset: 0; background: rgba(67,83,255,0.92);
       display: flex; align-items: center; justify-content: center;
-      opacity: 0; transition: opacity .3s;
+      opacity: 0; transition: opacity .3s; z-index: 3;
     }
     .proj-thumb:hover .overlay { opacity: 1; }
     .play-btn {
@@ -592,7 +612,9 @@
 
       <div class="proj reveal d1">
         <div class="proj-thumb" onclick="openDemo('food')">
-          <div class="emoji">🍔</div>
+          <iframe class="thumb-frame" src="projects/food-store/index.html" loading="lazy" scrolling="no" tabindex="-1" aria-hidden="true" title="FoodGo preview"></iframe>
+          <div class="thumb-badge">🍔</div>
+          <div class="thumb-live"><span class="live-dot"></span>Live</div>
           <div class="overlay"><button class="play-btn">▶ Try it live</button></div>
         </div>
         <div class="proj-body">
@@ -607,7 +629,9 @@
 
       <div class="proj reveal d2">
         <div class="proj-thumb" onclick="openDemo('leasing')">
-          <div class="emoji">🚗</div>
+          <iframe class="thumb-frame" src="projects/leasing/index.html" loading="lazy" scrolling="no" tabindex="-1" aria-hidden="true" title="ЛизингПро preview"></iframe>
+          <div class="thumb-badge">🚗</div>
+          <div class="thumb-live"><span class="live-dot"></span>Live</div>
           <div class="overlay"><button class="play-btn">▶ Try it live</button></div>
         </div>
         <div class="proj-body">
@@ -622,7 +646,9 @@
 
       <div class="proj reveal d3">
         <div class="proj-thumb" onclick="openDemo('rpg')">
-          <div class="emoji">⚔️</div>
+          <iframe class="thumb-frame" src="projects/rpg-bulgaria/index.html" loading="lazy" scrolling="no" tabindex="-1" aria-hidden="true" title="Легенди на България preview"></iframe>
+          <div class="thumb-badge">⚔️</div>
+          <div class="thumb-live"><span class="live-dot"></span>Live</div>
           <div class="overlay"><button class="play-btn">▶ Try it live</button></div>
         </div>
         <div class="proj-body">
