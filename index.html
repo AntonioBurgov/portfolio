@@ -33,10 +33,14 @@
       --font-head: 'Space Grotesk', system-ui, sans-serif;
       --font-body: 'Inter', system-ui, -apple-system, sans-serif;
 
-      /* saved hero-photo placement */
+      /* saved hero-photo placement (desktop) */
       --photo-size: 996px;
       --photo-x: 600px;
       --photo-y: 144px;
+      /* saved hero-photo placement (mobile / phone) */
+      --photo-size-m: 640px;
+      --photo-x-m: 113px;
+      --photo-y-m: 135px;
     }
 
     [data-theme="dark"] {
@@ -495,7 +499,7 @@
       .hero-text p { margin-left: auto; margin-right: auto; }
       .hero-actions { justify-content: center; }
       .hero-photo { width: auto; flex: none; align-self: auto; }
-      .hero-photo img { position: relative; right: auto; top: auto; width: min(var(--photo-size, 520px), 66vw); max-height: 58vh; transform: none; }
+      .hero-photo img { position: relative; right: auto; top: auto; width: min(var(--photo-size-m, 300px), 92vw); max-height: 60vh; transform: translate(var(--photo-x-m, 0px), var(--photo-y-m, 0px)); }
       .hero-photo .ring { width: 230px; height: 230px; }
       .photo-ph { width: 220px; height: 300px; }
       .scroll-cue { display: none; }
